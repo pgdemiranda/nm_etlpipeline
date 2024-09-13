@@ -5,13 +5,13 @@
 # Estrutura do Projeto:
 
 # Ferramentas Utilizadas:
-- Python
+- Python 3.10.13
 - Postgres
 - AWS (EC2)
 - Docker
 - Snowflake
 - Airflow
-- DBT
+- DBT Cloud
 - Looker Studio
 
 # Soluções Aplicadas: 
