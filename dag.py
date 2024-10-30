@@ -23,6 +23,7 @@ default_args = {
 def postgres_to_snowflake_etl():
     table_names = ['veiculos', 'estados', 'cidades', 'concessionarias', 'vendedores', 'clientes', 'vendas']
 
+    # Gets the maximum primary key from Snowflake
     @task
     def get_max_primary_key(table_name: str):
         with SnowflakeHook(snowflake_conn_id='snowflake').get_conn() as conn:
@@ -31,6 +32,7 @@ def postgres_to_snowflake_etl():
                 max_id = cursor.fetchone()[0]
                 return max_id if max_id is not None else 0
 
+    # Incremental Data Loading
     @task
     def load_incremental_data(table_name: str, max_id: int):
         with PostgresHook(postgres_conn_id='postgres').get_conn() as pg_conn:
@@ -56,7 +58,10 @@ def postgres_to_snowflake_etl():
     
     # Setting dependencies outside the loop to avoid creating cycles
     for table_name in table_names:
-        max_id = get_max_primary_key(table_name)  # Gets the maximum primary key from Snowflake
-        load_incremental_data(table_name, max_id)  # Loads incremental data from Postgres to Snowflake
+        # Gets the maximum primary key from Snowflake
+        max_id = get_max_primary_key(table_name)
+
+        # Loads incremental data from Postgres to Snowflake
+        load_incremental_data(table_name, max_id)
 
 postgres_to_snowflake_etl_dag = postgres_to_snowflake_etl()
